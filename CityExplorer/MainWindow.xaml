@@ -1,0 +1,43 @@
+﻿<Window x:Class="CityExplorer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CityExplorer"
+        xmlns:col="clr-namespace:System.Collections;assembly=mscorlib"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="295" Width="550" MinHeight="295" MinWidth="550">
+    <DockPanel>
+        <ListView Width="340" DockPanel.Dock="Left" ItemsSource="{Binding Communities}" SelectedItem="{Binding SelectedCommunity}">
+            <ListView.View>
+                <GridView>
+                    <GridViewColumn DisplayMemberBinding="{Binding Title}">Название</GridViewColumn>
+                    <GridViewColumn DisplayMemberBinding="{Binding FederationSubject}">Субъект</GridViewColumn>
+                    <GridViewColumn DisplayMemberBinding="{Binding Population}">Жители</GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+        <StackPanel Orientation="Vertical">
+            <TextBlock>Субъект федерации</TextBlock>
+            <ComboBox ItemsSource="{Binding FederationSubjects}" Margin="0 0 0 10" />
+            
+            <TextBlock>Наименование</TextBlock>
+            <TextBox Margin="0 0 0 10" />
+            
+            <TextBlock>Тип</TextBlock>
+            <ComboBox ItemsSource="{Binding CommunityTypes}" Margin="0 0 0 10" />
+            
+            <TextBlock>Год основания</TextBlock>
+            <TextBox Margin="0 0 0 10" />
+            
+            <TextBlock>Кол-во жителей</TextBlock>
+            <TextBox Margin="0 0 0 10" />
+            
+            <UniformGrid Rows="1" Columns="3">
+                <Button Content="Добавить" Padding="5 5 5 5" />
+                <Button Content="Сохранить" Padding="5 5 5 5" />
+                <Button Content="Удалить" Padding="5 5 5 5" />
+            </UniformGrid>
+        </StackPanel>
+    </DockPanel>
+</Window>
