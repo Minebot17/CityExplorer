@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:CityExplorer"
         xmlns:col="clr-namespace:System.Collections;assembly=mscorlib"
         mc:Ignorable="d"
-        Title="MainWindow" Height="295" Width="550" MinHeight="295" MinWidth="550">
+        Title="MainWindow" Height="295" Width="570" MinHeight="295" MinWidth="570">
     <DockPanel>
         <ListView Width="340" DockPanel.Dock="Left" ItemsSource="{Binding Communities}" SelectedItem="{Binding SelectedCommunity}">
             <ListView.View>
@@ -19,19 +19,19 @@
         </ListView>
         <StackPanel Orientation="Vertical">
             <TextBlock>Субъект федерации</TextBlock>
-            <ComboBox ItemsSource="{Binding FederationSubjects}" Margin="0 0 0 10" />
+            <ComboBox SelectedItem="{Binding SelectedCommunity.FederationSubject}" ItemsSource="{Binding FederationSubjects}" Margin="0 0 0 10" />
             
-            <TextBlock>Наименование</TextBlock>
-            <TextBox Margin="0 0 0 10" />
+            <TextBlock Name="TestTextBox">Наименование</TextBlock>
+            <TextBox Text="{Binding SelectedCommunity.Title}" Margin="0 0 0 10" />
             
             <TextBlock>Тип</TextBlock>
-            <ComboBox ItemsSource="{Binding CommunityTypes}" Margin="0 0 0 10" />
+            <ComboBox SelectedItem="{Binding SelectedCommunity.CommunityType}" ItemsSource="{Binding CommunityTypes}" Margin="0 0 0 10" />
             
             <TextBlock>Год основания</TextBlock>
-            <TextBox Margin="0 0 0 10" />
+            <TextBox Text="{Binding SelectedCommunity.FoundationYear}" Margin="0 0 0 10" />
             
             <TextBlock>Кол-во жителей</TextBlock>
-            <TextBox Margin="0 0 0 10" />
+            <TextBox Text="{Binding SelectedCommunity.Population}" Margin="0 0 0 10" />
             
             <UniformGrid Rows="1" Columns="3">
                 <Button Content="Добавить" Padding="5 5 5 5" />

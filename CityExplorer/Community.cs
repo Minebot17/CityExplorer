@@ -7,11 +7,14 @@ namespace CityExplorer
 {
     public class Community : INotifyPropertyChanged
     {
+        private long id;
         private string federationSubject = "";
         private string communityType = "";
         private string title = "";
         private int population;
         private int foundationYear;
+        
+        public long Id => id;
 
         public string FederationSubject
         {
