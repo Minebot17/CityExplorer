@@ -41,13 +41,17 @@
         <Compile Include="Community.cs" />
         <Compile Include="CommunityFabric.cs" />
         <Compile Include="FileDataSerializer.cs" />
-        <Compile Include="IDataSerializer.cs" />
-        <Compile Include="ISerializableFabric.cs" />
-        <Compile Include="IStringSerializable.cs" />
+        <Compile Include="Interfaces\IDataSerializer.cs" />
+        <Compile Include="Interfaces\ISerializableFabric.cs" />
+        <Compile Include="Interfaces\IServerOperation.cs" />
+        <Compile Include="Interfaces\IStringSerializable.cs" />
+        <Compile Include="Operations\AddCommunityOperation.cs" />
+        <Compile Include="Operations\EditCommunityOperation.cs" />
+        <Compile Include="Operations\RemoveCommunityOperation.cs" />
         <Compile Include="Program.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
         <Compile Include="ServerConfig.cs" />
-        <Compile Include="ServerManager.cs" />
+        <Compile Include="CommunityManager.cs" />
         <Compile Include="StringStream.cs" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

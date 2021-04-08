@@ -4,7 +4,7 @@ namespace CityExplorerServer
 {
     public class Community : IStringSerializable
     {
-        private long Id { get; set; }
+        public long Id { get; private set; }
         private string FederationSubject { get; set; } = "Московская область";
         private string CommunityType { get; set; } = "город";
         private string Title { get; set; } = "Москва";

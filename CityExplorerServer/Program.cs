@@ -3,6 +3,7 @@ using System.IO;
 using System.IO.Pipes;
 using System.Runtime.InteropServices;
 using System.Threading;
+using CityExplorerServer.Operations;
 
 namespace CityExplorerServer
 {
@@ -10,10 +11,16 @@ namespace CityExplorerServer
     {
         private const int SAVE_PERIOD = 30000;
         
-        public static ServerConfig ServerConfig;
         public static Random Random;
+        private static ServerConfig ServerConfig;
         private static int maxClients;
-        private static ServerManager serverManager;
+        private static CommunityManager communityManager;
+        private static readonly IServerOperation<CommunityManager>[] serverOperations = // TODO позже сделать синхронизацию операций с другими клиентами
+        {
+            new AddCommunityOperation(),
+            new RemoveCommunityOperation(),
+            new EditCommunityOperation()
+        };
         
         [DllImport("Kernel32")]
         private static extern bool SetConsoleCtrlHandler(EventHandler handler, bool add);
@@ -32,7 +39,7 @@ namespace CityExplorerServer
 
         private static bool Handler(CtrlType sig)
         {
-            serverManager.SerializeAllData();
+            communityManager.SerializeAllData();
             Environment.Exit(-1);
             return true;
         }
@@ -44,11 +51,11 @@ namespace CityExplorerServer
             SetConsoleCtrlHandler(_handler, true);
             
             // Timer call save every period
-            Timer timer = new Timer(obj => { serverManager.SerializeAllData(); }, null, SAVE_PERIOD, SAVE_PERIOD);
+            Timer timer = new Timer(obj => { communityManager.SerializeAllData(); }, null, SAVE_PERIOD, SAVE_PERIOD);
 
             Random = new Random();
             ServerConfig = new ServerConfig();
-            serverManager = new ServerManager(new FileDataSerializer(AppDomain.CurrentDomain.BaseDirectory + ServerConfig["saveFileName"]));
+            communityManager = new CommunityManager(new FileDataSerializer(AppDomain.CurrentDomain.BaseDirectory + ServerConfig["saveFileName"]));
 
             string serverType = ServerConfig["serverType"];
             maxClients = int.Parse(ServerConfig["maxClients"]);
@@ -102,6 +109,8 @@ namespace CityExplorerServer
         {
             NamedPipeServerStream pipeServer = new NamedPipeServerStream("cityExplorerPipe", PipeDirection.InOut, maxClients);
             int threadId = Thread.CurrentThread.ManagedThreadId;
+            pipeServer.ReadTimeout = 5000;
+            pipeServer.WriteTimeout = 5000;
 
             while (true)
             {
@@ -112,6 +121,12 @@ namespace CityExplorerServer
                 {
                     StreamString ss = new StreamString(pipeServer);
                     ss.WriteString("I am the one true server!");
+
+                    while (true)
+                    {
+                        int operationId = pipeServer.ReadByte();
+                        serverOperations[operationId].Execute(communityManager, pipeServer);
+                    }
                 }
                 catch (IOException e)
                 {
