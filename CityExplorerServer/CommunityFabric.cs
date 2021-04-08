@@ -1,8 +1,8 @@
 ﻿namespace CityExplorerServer
 {
-    public class CommunityFabric : ISerializableFabric
+    public class CommunityFabric : ISerializableFabric<Community>
     {
-        public IStringSerializable Create()
+        public Community Create()
         {
             return new Community();
         }

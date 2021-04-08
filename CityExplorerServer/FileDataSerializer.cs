@@ -14,23 +14,23 @@ namespace CityExplorerServer
             filePath = absoluteFilePath;
         }
         
-        public void Save(List<IStringSerializable> data)
+        public void Save<T>(List<T> data) where T : IStringSerializable
         {
             List<string> content = new List<string>();
-            foreach (IStringSerializable serializable in data)
+            foreach (T serializable in data)
                 content.AddRange(serializable.Serialize());
             
             File.WriteAllLines(filePath, content, Encoding.UTF8);
         }
 
-        public List<IStringSerializable> Load(ISerializableFabric serializableFabric)
+        public List<T> Load<T>(ISerializableFabric<T> serializableFabric) where T : IStringSerializable
         {
-            List<IStringSerializable> result = new List<IStringSerializable>();
+            List<T> result = new List<T>();
             List<string> fileLines = File.ReadAllLines(filePath, Encoding.UTF8).ToList();
 
             while (fileLines.Count > 0)
             {
-                IStringSerializable nextObject = serializableFabric.Create();
+                T nextObject = serializableFabric.Create();
                 int linesSize = nextObject.GetLinesSize();
                 
                 if (linesSize > fileLines.Count)

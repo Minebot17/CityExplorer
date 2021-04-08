@@ -21,7 +21,7 @@
             <TextBlock>Субъект федерации</TextBlock>
             <ComboBox SelectedItem="{Binding SelectedCommunity.FederationSubject}" ItemsSource="{Binding FederationSubjects}" Margin="0 0 0 10" />
             
-            <TextBlock Name="TestTextBox">Наименование</TextBlock>
+            <TextBlock>Наименование</TextBlock>
             <TextBox Text="{Binding SelectedCommunity.Title}" Margin="0 0 0 10" />
             
             <TextBlock>Тип</TextBlock>

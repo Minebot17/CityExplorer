@@ -4,7 +4,7 @@ namespace CityExplorerServer
 {
     public interface IDataSerializer
     {
-        void Save(List<IStringSerializable> data);
-        List<IStringSerializable> Load(ISerializableFabric serializableFabric);
+        void Save<T>(List<T> data) where T : IStringSerializable;
+        List<T> Load<T>(ISerializableFabric<T> serializableFabric) where T : IStringSerializable;
     }
 }

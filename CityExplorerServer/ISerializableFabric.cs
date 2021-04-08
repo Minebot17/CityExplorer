@@ -1,7 +1,7 @@
 ﻿namespace CityExplorerServer
 {
-    public interface ISerializableFabric
+    public interface ISerializableFabric<T> where T : IStringSerializable
     {
-        IStringSerializable Create();
+        T Create();
     }
 }

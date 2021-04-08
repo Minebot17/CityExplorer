@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO.Pipes;
 using System.Runtime.CompilerServices;
+using System.Security.Principal;
 using CityExplorer.Annotations;
+using CityExplorerServer;
 
 namespace CityExplorer
 {
@@ -35,6 +38,26 @@ namespace CityExplorer
 
             FederationSubjects = new ObservableCollection<string>() { "Волгоградская область", "Московская область", "Ростовская область" };
             CommunityTypes = new ObservableCollection<string>() { "город", "поселок", "деревня" };
+            
+            NamedPipeClientStream pipeClient = 
+                new NamedPipeClientStream(".", "cityExplorerPipe", PipeDirection.InOut, 
+                    PipeOptions.None, TokenImpersonationLevel.Impersonation);
+
+            try
+            {
+                pipeClient.Connect(1000);
+                StreamString ss = new StreamString(pipeClient);
+
+                if (ss.ReadString() == "I am the one true server!")
+                {
+                    
+                }
+                else
+                    Console.WriteLine("Server could not be verified.");
+            }
+            catch (TimeoutException){}
+            
+            pipeClient.Close();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
