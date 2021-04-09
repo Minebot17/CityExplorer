@@ -1,16 +1,43 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace CityExplorerServer.NetworkSystem
 {
     public class PacketStream
     {
+        private const int BUFFER_DATA_COUNT = 10240;
+        
         private Stream stream;
         private byte[] buffer = new byte[8];
+        private MemoryStream memoryStream;
+        private int dataSize;
 
         public PacketStream(Stream stream)
         {
             this.stream = stream;
+            memoryStream = new MemoryStream(new byte[BUFFER_DATA_COUNT]);
+            
+        }
+
+        public void CollectData(int collectTime)
+        {
+            memoryStream.Seek(0, SeekOrigin.Begin);
+            Task<int> readTask = stream.ReadAsync(memoryStream.GetBuffer(), 0, BUFFER_DATA_COUNT);
+            Thread.Sleep(collectTime);
+            dataSize = readTask.Result;
+            readTask.Dispose();
+        }
+
+        public bool DataIsOver()
+        {
+            return memoryStream.Position >= dataSize;
+        }
+
+        public void Flush()
+        {
+            stream.Flush();
         }
 
         public void Write<T>(T value)
@@ -21,8 +48,6 @@ namespace CityExplorerServer.NetworkSystem
                 WriteLong(b);
             else if (value is string c)
                 WriteString(c);
-            else if (value is byte d)
-                WriteByte(d);
         }
         
         private void WriteInt(int value)
@@ -43,26 +68,24 @@ namespace CityExplorerServer.NetworkSystem
             streamString.WriteString(value);
         }
 
-        private void WriteByte(byte value)
-        {
-            stream.WriteByte(value);
-        }
-
         public int ReadInt()
         {
-            stream.Read(buffer, 0, 4);
+            Stream actualStream = DataIsOver() ? stream : memoryStream;
+            actualStream.Read(buffer, 0, 4);
             return BitConverter.ToInt32(buffer, 0);
         }
         
         public long ReadLong()
         {
-            stream.Read(buffer, 0, 8);
+            Stream actualStream = DataIsOver() ? stream : memoryStream;
+            actualStream.Read(buffer, 0, 8);
             return BitConverter.ToInt64(buffer, 0);
         }
         
         public string ReadString()
         {
-            StreamString streamString = new StreamString(stream);
+            Stream actualStream = DataIsOver() ? stream : memoryStream;
+            StreamString streamString = new StreamString(actualStream);
             return streamString.ReadString();
         }
     }

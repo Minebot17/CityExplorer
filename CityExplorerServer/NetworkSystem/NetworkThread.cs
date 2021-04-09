@@ -20,30 +20,28 @@ namespace CityExplorerServer.NetworkSystem
             this.stream = stream;
             streamString = new StreamString(stream);
             packetStream = new PacketStream(stream);
-            stream.ReadTimeout = DELAY_PACKET_HANDLE;
-            stream.WriteTimeout = 2000;
         }
 
         public bool HandleStream()
         {
             if (sendQueue.Count == 0)
             {
-                try
+                packetStream.CollectData(DELAY_PACKET_HANDLE);
+
+                while (!packetStream.DataIsOver())
                 {
-                    stream.ReadByte();
                     string packetName = streamString.ReadString();
                     NetworkManager.RecievePacketFromThread(packetName, packetStream);
                 }
-                catch (IOException) { }
             }
             else
             {
                 try
                 {
-                    packetStream.Write((byte)1);
                     (string, object) paketUnit = sendQueue.Dequeue();
                     packetStream.Write(paketUnit.Item1);
                     NetworkManager.SendPacketToOtherSide(paketUnit.Item1, paketUnit.Item2, packetStream);
+                    packetStream.Flush();
                 }
                 catch (IOException e)
                 {

@@ -90,9 +90,12 @@ namespace CityExplorerServer.NetworkSystem
             if (serverThreads == null)
                 throw new IOException("You didnt initialize NetworkManager");
 
-            foreach (INetworkThread serverThread in serverThreads)
-                if (serverThread.IsConnected())
-                    serverThread.AddToSendQueue(packetName, args);
+            lock (serverThreads)
+            {
+                foreach (INetworkThread serverThread in serverThreads)
+                    if (serverThread.IsConnected())
+                        serverThread.AddToSendQueue(packetName, args);
+            }
         }
 
         public static void SendPacketToServer(string packetName, object args)
