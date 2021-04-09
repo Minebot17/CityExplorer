@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Pipes;
 using System.Runtime.InteropServices;
 using System.Threading;
+using System.Threading.Tasks;
+using CityExplorerServer.NetworkSystem;
 using CityExplorerServer.Operations;
 
 namespace CityExplorerServer
@@ -15,12 +18,18 @@ namespace CityExplorerServer
         private static ServerConfig ServerConfig;
         private static int maxClients;
         private static CommunityManager communityManager;
-        private static readonly IServerOperation<CommunityManager>[] serverOperations = // TODO позже сделать синхронизацию операций с другими клиентами
+        private static INetworkThread[] serverThreads;
+        
+        private static readonly List<IPacket> packetsToRegister = new List<IPacket>()
         {
-            new AddCommunityOperation(),
-            new RemoveCommunityOperation(),
-            new EditCommunityOperation()
+            
         };
+        
+        private static readonly List<IPacketHandler> handlersToRegister = new List<IPacketHandler>()
+        {
+            
+        };
+        
         
         [DllImport("Kernel32")]
         private static extern bool SetConsoleCtrlHandler(EventHandler handler, bool add);
@@ -59,6 +68,20 @@ namespace CityExplorerServer
 
             string serverType = ServerConfig["serverType"];
             maxClients = int.Parse(ServerConfig["maxClients"]);
+            serverThreads = new INetworkThread[maxClients];
+            for (int i = 0; i < serverThreads.Length; i++)
+                serverThreads[i] = new NetworkThread();
+            
+            // Setup NetworkManager
+            NetworkManager.InitializeServer(serverThreads);
+            
+            foreach (IPacket packet in packetsToRegister)
+                NetworkManager.RegisterPacket(packet);
+            
+            foreach (IPacketHandler handler in handlersToRegister)
+                NetworkManager.RegisterHandler(handler);
+            
+            NetworkManager.BindArgsToAllRegisteredHandlers(communityManager);
 
             if (serverType.Equals("socket"))
             {
@@ -73,8 +96,8 @@ namespace CityExplorerServer
                 
                 for (i = 0; i < maxClients; i++)
                 {
-                    servers[i] = new Thread(ServerThread);
-                    servers[i].Start();
+                    servers[i] = new Thread(ServerPipeThread);
+                    servers[i].Start(serverThreads[i]);
                 }
                 
                 Thread.Sleep(250);
@@ -105,17 +128,18 @@ namespace CityExplorerServer
             return BitConverter.ToInt64(bytes, 0);
         }
         
-        private static void ServerThread(object data)
+        private static void ServerPipeThread(object data)
         {
             NamedPipeServerStream pipeServer = new NamedPipeServerStream("cityExplorerPipe", PipeDirection.InOut, maxClients);
             int threadId = Thread.CurrentThread.ManagedThreadId;
-            pipeServer.ReadTimeout = 5000;
-            pipeServer.WriteTimeout = 5000;
+            INetworkThread networkThread = (INetworkThread) data;
+            networkThread.SetStream(pipeServer);
 
             while (true)
             {
                 pipeServer.WaitForConnection();
                 Console.WriteLine("Client connected on thread[{0}].", threadId);
+                networkThread.OnConnected();
 
                 try
                 {
@@ -124,8 +148,7 @@ namespace CityExplorerServer
 
                     while (true)
                     {
-                        int operationId = pipeServer.ReadByte();
-                        serverOperations[operationId].Execute(communityManager, pipeServer);
+                        networkThread.HandleStream();
                     }
                 }
                 catch (IOException e)
@@ -134,11 +157,10 @@ namespace CityExplorerServer
                 }
                 
                 pipeServer.Disconnect();
+                networkThread.OnDisconnected();
             }
 
             pipeServer.Close();
         }
-        
-        
     }
 }
