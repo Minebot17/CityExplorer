@@ -4,8 +4,11 @@ using System.ComponentModel;
 using System.IO.Pipes;
 using System.Runtime.CompilerServices;
 using System.Security.Principal;
+using System.Threading;
+using System.Windows.Input;
 using CityExplorer.Annotations;
 using CityExplorerServer;
+using CityExplorerServer.NetworkSystem;
 
 namespace CityExplorer
 {
@@ -16,7 +19,6 @@ namespace CityExplorer
         public ObservableCollection<Community> Communities { get; set; }
 
         private Community selectedCommunity;
-        
         public Community SelectedCommunity
         {
             get => selectedCommunity;
@@ -26,6 +28,26 @@ namespace CityExplorer
                 OnPropertyChanged(nameof(SelectedCommunity));
             }
         }
+
+        private RelayCommand? addCommunityCommand;
+        public RelayCommand AddCommunityCommand => addCommunityCommand ??= new RelayCommand(args =>
+        {
+            NetworkManager.SendPacketToServer("addCommunityRequest", null);
+        });
+        
+        private RelayCommand? removeCommunityCommand;
+        public RelayCommand RemoveCommunityCommand => removeCommunityCommand ??= new RelayCommand(args =>
+        {
+            long idToRemove = (long) args;
+            NetworkManager.SendPacketToServer("removeCommunityRequest", idToRemove);
+        });
+        
+        private RelayCommand? editedCommunityCommand; // Отправляется при любом изменении данных
+        public RelayCommand EditedCommunityCommand => editedCommunityCommand ??= new RelayCommand(args =>
+        {
+            Community selectedCommunity = (Community) args;
+            NetworkManager.SendPacketToServer("editCommunityRequest", selectedCommunity);
+        });
 
         public ApplicationViewModel()
         {
@@ -38,26 +60,9 @@ namespace CityExplorer
 
             FederationSubjects = new ObservableCollection<string>() { "Волгоградская область", "Московская область", "Ростовская область" };
             CommunityTypes = new ObservableCollection<string>() { "город", "поселок", "деревня" };
-            
-            NamedPipeClientStream pipeClient = 
-                new NamedPipeClientStream(".", "cityExplorerPipe", PipeDirection.InOut, 
-                    PipeOptions.None, TokenImpersonationLevel.Impersonation);
 
-            try
-            {
-                pipeClient.Connect(1000);
-                StreamString ss = new StreamString(pipeClient);
-
-                if (ss.ReadString() == "I am the one true server!")
-                {
-                    
-                }
-                else
-                    Console.WriteLine("Server could not be verified.");
-            }
-            catch (TimeoutException){}
-            
-            pipeClient.Close();
+            Thread clientThread = new Thread(CommunityClient.Start);
+            clientThread.Start(this);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

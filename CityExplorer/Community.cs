@@ -1,20 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using CityExplorer.Annotations;
+using CityExplorerServer;
 
 namespace CityExplorer
 {
-    public class Community : INotifyPropertyChanged
+    public class Community : INotifyPropertyChanged, IStringSerializable
     {
-        private long id;
         private string federationSubject = "";
         private string communityType = "";
         private string title = "";
         private int population;
         private int foundationYear;
         
-        public long Id => id;
+        public long Id { get; set; }
 
         public string FederationSubject
         {
@@ -69,6 +70,34 @@ namespace CityExplorer
         public override string ToString()
         {
             return Title;
+        }
+        
+        public List<string> Serialize()
+        {
+            return new List<string>()
+            {
+                Id.ToString(),
+                FederationSubject,
+                CommunityType,
+                Title,
+                Population.ToString(),
+                FoundationYear.ToString()
+            };
+        }
+
+        public void Deserialize(List<string> lines)
+        {
+            Id = int.Parse(lines[0]);
+            FederationSubject = lines[1];
+            CommunityType = lines[2];
+            Title = lines[3];
+            Population = int.Parse(lines[4]);
+            FoundationYear = int.Parse(lines[5]);
+        }
+
+        public int GetLinesSize()
+        {
+            return 6;
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

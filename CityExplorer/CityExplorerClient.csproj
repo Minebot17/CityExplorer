@@ -52,7 +52,37 @@
             <Generator>MSBuild:Compile</Generator>
             <SubType>Designer</SubType>
         </ApplicationDefinition>
-        <Compile Include="StringStream.cs" />
+        <Compile Include="..\CityExplorerServer\Interfaces\IStringSerializable.cs">
+          <Link>IStringSerializable.cs</Link>
+        </Compile>
+        <Compile Include="..\CityExplorerServer\NetworkSystem\INetworkThread.cs">
+          <Link>NetworkSystem\INetworkThread.cs</Link>
+        </Compile>
+        <Compile Include="..\CityExplorerServer\NetworkSystem\IPacket.cs">
+          <Link>NetworkSystem\IPacket.cs</Link>
+        </Compile>
+        <Compile Include="..\CityExplorerServer\NetworkSystem\IPacketHandler.cs">
+          <Link>NetworkSystem\IPacketHandler.cs</Link>
+        </Compile>
+        <Compile Include="..\CityExplorerServer\NetworkSystem\NetworkManager.cs">
+          <Link>NetworkSystem\NetworkManager.cs</Link>
+        </Compile>
+        <Compile Include="..\CityExplorerServer\NetworkSystem\NetworkThread.cs">
+          <Link>NetworkSystem\NetworkThread.cs</Link>
+        </Compile>
+        <Compile Include="..\CityExplorerServer\NetworkSystem\PacketStream.cs">
+          <Link>NetworkSystem\PacketStream.cs</Link>
+        </Compile>
+        <Compile Include="..\CityExplorerServer\NetworkSystem\StringStream.cs">
+          <Link>NetworkSystem\StringStream.cs</Link>
+        </Compile>
+        <Compile Include="Handlers\AddCommuntiyHandler.cs" />
+        <Compile Include="Handlers\EditCommunityHandler.cs" />
+        <Compile Include="Handlers\RemoveCommunityHandler.cs" />
+        <Compile Include="Packets\AddCommunityPacket.cs" />
+        <Compile Include="Packets\EditCommunityPacket.cs" />
+        <Compile Include="Packets\RemoveCommunityPacket.cs" />
+        <Compile Include="RelayCommand.cs" />
         <Page Include="MainWindow.xaml">
             <Generator>MSBuild:Compile</Generator>
             <SubType>Designer</SubType>
@@ -63,6 +93,7 @@
         </Compile>
         <Compile Include="ApplicationViewModel.cs" />
         <Compile Include="Community.cs" />
+        <Compile Include="CommunityClient.cs" />
         <Compile Include="MainWindow.xaml.cs">
             <DependentUpon>MainWindow.xaml</DependentUpon>
             <SubType>Code</SubType>
