@@ -4,7 +4,7 @@ namespace CityExplorerServer.Handlers
 {
     public class AddCommunityHandler : IPacketHandler
     {
-        public void Handle(object bindedArgs, PacketStream stream)
+        public void Handle(object bindedArgs, PacketStream stream, INetworkThread thread)
         {
             CommunityManager communityManager = (CommunityManager) bindedArgs;
             Community addedCommunity = communityManager.AddNewCommunity();

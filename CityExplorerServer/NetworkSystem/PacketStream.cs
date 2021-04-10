@@ -13,25 +13,34 @@ namespace CityExplorerServer.NetworkSystem
         private Stream stream;
         private StreamString streamString;
         private byte[] buffer = new byte[8];
+        private byte[] memoryBuffer;
         private MemoryStream memoryStream;
         private StreamString memoryStreamString;
         private int dataSize;
+        private CancellationTokenSource tokenSource;
 
         public PacketStream(Stream stream)
         {
             this.stream = stream;
-            memoryStream = new MemoryStream(new byte[BUFFER_DATA_COUNT]);
+            memoryBuffer = new byte[BUFFER_DATA_COUNT];
+            memoryStream = new MemoryStream(memoryBuffer);
             streamString = new StreamString(stream);
             memoryStreamString = new StreamString(memoryStream);
+            tokenSource = new CancellationTokenSource();
         }
 
         public void CollectData(int collectTime)
         {
             memoryStream.Seek(0, SeekOrigin.Begin);
-            Task<int> readTask = stream.ReadAsync(memoryStream.GetBuffer(), 0, BUFFER_DATA_COUNT);
+            Task<int> readTask = stream.ReadAsync(memoryBuffer, 0, BUFFER_DATA_COUNT, tokenSource.Token);
             Thread.Sleep(collectTime);
+            tokenSource.Cancel();
+            Thread.Sleep(collectTime/5);
+            
+            if (readTask.IsCanceled)
+                readTask.Dispose();
+            
             dataSize = readTask.Result;
-            readTask.Dispose();
         }
 
         public bool DataIsOver()

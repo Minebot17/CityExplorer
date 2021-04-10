@@ -58,9 +58,9 @@ namespace CityExplorerServer.NetworkSystem
                 handlersArgs[pair.Key] = args;
         }
 
-        public static void RecievePacketFromThread(string packetName, PacketStream stream)
+        public static void RecievePacketFromThread(string packetName, PacketStream stream, INetworkThread threadRecieved)
         {
-            handlers[packetName].Handle(handlersArgs.ContainsKey(packetName) ? handlersArgs[packetName] : null, stream);
+            handlers[packetName].Handle(handlersArgs.ContainsKey(packetName) ? handlersArgs[packetName] : null, stream, threadRecieved);
         }
         
         public static void SendPacketToOtherSide(string packetName, object args, PacketStream stream)

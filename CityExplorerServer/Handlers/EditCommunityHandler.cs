@@ -5,7 +5,7 @@ namespace CityExplorerServer.Handlers
 {
     public class EditCommunityHandler : IPacketHandler
     {
-        public void Handle(object bindedArgs, PacketStream stream)
+        public void Handle(object bindedArgs, PacketStream stream, INetworkThread thread)
         {
             CommunityManager communityManager = (CommunityManager) bindedArgs;
             long idToEdit = stream.ReadLong();

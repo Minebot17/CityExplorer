@@ -43,6 +43,7 @@
         <Compile Include="FileDataSerializer.cs" />
         <Compile Include="Handlers\AddCommunityHandler.cs" />
         <Compile Include="Handlers\EditCommunityHandler.cs" />
+        <Compile Include="Handlers\GetAllDataHandler.cs" />
         <Compile Include="Handlers\RemoveCommunityHandler.cs" />
         <Compile Include="Interfaces\IDataSerializer.cs" />
         <Compile Include="Interfaces\ISerializableFabric.cs" />
@@ -57,6 +58,7 @@
         <Compile Include="NetworkSystem\StringStream.cs" />
         <Compile Include="Packets\AddCommunityPacket.cs" />
         <Compile Include="Packets\EditCommunityPacket.cs" />
+        <Compile Include="Packets\GetAllDataPacket.cs" />
         <Compile Include="Packets\RemoveCommunityPacket.cs" />
         <Compile Include="Program.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />

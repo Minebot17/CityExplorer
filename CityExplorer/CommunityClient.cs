@@ -15,14 +15,16 @@ namespace CityExplorer
         {
             new AddCommunityPacket(),
             new RemoveCommunityPacket(),
-            new EditCommunityPacket()
+            new EditCommunityPacket(),
+            new GetAllDataPacket()
         };
         
         private static readonly List<IPacketHandler> handlersToRegister = new List<IPacketHandler>()
         {
             new AddCommuntiyHandler(),
             new RemoveCommunityHandler(),
-            new EditCommunityHandler()
+            new EditCommunityHandler(),
+            new GetAllDataHandler()
         };
         
         public static void Start(object args)
@@ -53,13 +55,15 @@ namespace CityExplorer
 
                 if (ss.ReadString() == "I am the one true server!")
                 {
+                    NetworkManager.SendPacketToServer("getAllDataRequest", null);
+
                     while (true)
                         clientThread.HandleStream();
                 }
                 else
                     Console.WriteLine("Server could not be verified.");
             }
-            catch (TimeoutException){}
+            catch (TimeoutException e){ Console.WriteLine(e.Message); }
             
             clientThread.OnDisconnected();
             pipeClient.Close();

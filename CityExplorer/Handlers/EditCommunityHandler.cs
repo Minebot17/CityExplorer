@@ -6,12 +6,12 @@ namespace CityExplorer.Handlers
 {
     public class EditCommunityHandler : IPacketHandler
     {
-        public void Handle(object bindedArgs, PacketStream stream)
+        public void Handle(object bindedArgs, PacketStream stream, INetworkThread thread)
         {
             ApplicationViewModel viewModel = (ApplicationViewModel) bindedArgs;
             long idToEdit = stream.ReadLong();
             List<string> newData = stream.ReadStringList();
-            Community? editedCommunity = viewModel.Communities.FirstOrDefault(c => c.Id == idToEdit);
+            Community editedCommunity = viewModel.Communities.FirstOrDefault(c => c.Id == idToEdit);
             editedCommunity?.Deserialize(newData);
         }
 

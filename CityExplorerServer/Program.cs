@@ -25,14 +25,16 @@ namespace CityExplorerServer
         {
             new AddCommunityPacket(),
             new RemoveCommunityPacket(),
-            new EditCommunityPacket()
+            new EditCommunityPacket(),
+            new GetAllDataPacket()
         };
         
         private static readonly List<IPacketHandler> handlersToRegister = new List<IPacketHandler>()
         {
             new AddCommunityHandler(),
             new RemoveCommunityHandler(),
-            new EditCommunityHandler()
+            new EditCommunityHandler(),
+            new GetAllDataHandler()
         };
         
         

@@ -9,6 +9,8 @@ namespace CityExplorerServer
         private CommunityFabric fabric;
         private List<Community> communities;
 
+        public List<Community> Communities => communities;
+
         public CommunityManager(IDataSerializer serializer)
         {
             this.serializer = serializer;

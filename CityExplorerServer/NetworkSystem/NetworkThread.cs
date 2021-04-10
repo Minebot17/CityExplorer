@@ -7,7 +7,7 @@ namespace CityExplorerServer.NetworkSystem
 {
     public class NetworkThread : INetworkThread
     {
-        private const int DELAY_PACKET_HANDLE = 20;
+        private const int DELAY_PACKET_HANDLE = 100;
         
         private Stream stream;
         private PacketStream packetStream;
@@ -31,7 +31,7 @@ namespace CityExplorerServer.NetworkSystem
                 while (!packetStream.DataIsOver())
                 {
                     string packetName = streamString.ReadString();
-                    NetworkManager.RecievePacketFromThread(packetName, packetStream);
+                    NetworkManager.RecievePacketFromThread(packetName, packetStream, this);
                 }
             }
             else
@@ -48,9 +48,10 @@ namespace CityExplorerServer.NetworkSystem
                     Console.WriteLine(e);
                     return false;
                 }
+                
+                Thread.Sleep(DELAY_PACKET_HANDLE);
             }
             
-            Thread.Sleep(DELAY_PACKET_HANDLE);
             return true;
         }
 

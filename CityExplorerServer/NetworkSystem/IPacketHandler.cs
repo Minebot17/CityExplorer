@@ -2,7 +2,7 @@
 {
     public interface IPacketHandler
     {
-        void Handle(object bindedArgs, PacketStream stream);
+        void Handle(object bindedArgs, PacketStream stream, INetworkThread thread);
         string GetHandledPacketName();
     }
 }

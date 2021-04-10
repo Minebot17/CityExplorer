@@ -29,35 +29,29 @@ namespace CityExplorer
             }
         }
 
-        private RelayCommand? addCommunityCommand;
-        public RelayCommand AddCommunityCommand => addCommunityCommand ??= new RelayCommand(args =>
+        private RelayCommand addCommunityCommand;
+        public RelayCommand AddCommunityCommand => addCommunityCommand ?? (addCommunityCommand = new RelayCommand(args =>
         {
             NetworkManager.SendPacketToServer("addCommunityRequest", null);
-        });
+        }));
         
-        private RelayCommand? removeCommunityCommand;
-        public RelayCommand RemoveCommunityCommand => removeCommunityCommand ??= new RelayCommand(args =>
+        private RelayCommand removeCommunityCommand;
+        public RelayCommand RemoveCommunityCommand => removeCommunityCommand ?? (removeCommunityCommand = new RelayCommand(args =>
         {
             long idToRemove = (long) args;
             NetworkManager.SendPacketToServer("removeCommunityRequest", idToRemove);
-        });
+        }));
         
-        private RelayCommand? editedCommunityCommand; // Отправляется при любом изменении данных
-        public RelayCommand EditedCommunityCommand => editedCommunityCommand ??= new RelayCommand(args =>
+        private RelayCommand editedCommunityCommand; // Отправляется при любом изменении данных
+        public RelayCommand EditedCommunityCommand => editedCommunityCommand ?? (editedCommunityCommand= new RelayCommand(args =>
         {
             Community selectedCommunity = (Community) args;
             NetworkManager.SendPacketToServer("editCommunityRequest", selectedCommunity);
-        });
+        }));
 
         public ApplicationViewModel()
         {
-            Communities = new ObservableCollection<Community>()
-            {
-                new (this) { CommunityType = "поселок", FederationSubject = "Московская область", Population = 1000, Title = "Какой-то поселок", FoundationYear = 1920},
-                new (this) { CommunityType = "город", FederationSubject = "Волгоградская область", Population = 2000, Title = "Какой-то город", FoundationYear = 1990},
-                new (this) { CommunityType = "деревня", FederationSubject = "Ростовская область", Population = 3000, Title = "Какая-то деревня", FoundationYear = 1950}
-            };
-
+            Communities = new ObservableCollection<Community>();
             FederationSubjects = new ObservableCollection<string>() { "Волгоградская область", "Московская область", "Ростовская область" };
             CommunityTypes = new ObservableCollection<string>() { "город", "поселок", "деревня" };
 

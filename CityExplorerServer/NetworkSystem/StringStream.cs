@@ -38,7 +38,6 @@ namespace CityExplorerServer
             ioStream.WriteByte((byte)(len / 256));
             ioStream.WriteByte((byte)(len & 255));
             ioStream.Write(outBuffer, 0, len);
-            ioStream.Flush();
 
             return outBuffer.Length + 2;
         }
