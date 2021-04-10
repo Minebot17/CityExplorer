@@ -7,7 +7,7 @@ namespace CityExplorer.Handlers
         public void Handle(object bindedArgs, PacketStream stream)
         {
             ApplicationViewModel viewModel = (ApplicationViewModel) bindedArgs;
-            Community newCommunity = new Community();
+            Community newCommunity = new Community(viewModel);
             newCommunity.Deserialize(stream.ReadStringList());
             viewModel.Communities.Add(newCommunity);
         }

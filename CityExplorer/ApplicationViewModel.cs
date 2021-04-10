@@ -53,9 +53,9 @@ namespace CityExplorer
         {
             Communities = new ObservableCollection<Community>()
             {
-                new () { CommunityType = "поселок", FederationSubject = "Московская область", Population = 1000, Title = "Какой-то поселок", FoundationYear = 1920},
-                new () { CommunityType = "город", FederationSubject = "Волгоградская область", Population = 2000, Title = "Какой-то город", FoundationYear = 1990},
-                new () { CommunityType = "деревня", FederationSubject = "Ростовская область", Population = 3000, Title = "Какая-то деревня", FoundationYear = 1950}
+                new (this) { CommunityType = "поселок", FederationSubject = "Московская область", Population = 1000, Title = "Какой-то поселок", FoundationYear = 1920},
+                new (this) { CommunityType = "город", FederationSubject = "Волгоградская область", Population = 2000, Title = "Какой-то город", FoundationYear = 1990},
+                new (this) { CommunityType = "деревня", FederationSubject = "Ростовская область", Population = 3000, Title = "Какая-то деревня", FoundationYear = 1950}
             };
 
             FederationSubjects = new ObservableCollection<string>() { "Волгоградская область", "Московская область", "Ростовская область" };

@@ -15,6 +15,9 @@ namespace CityExplorer
         private int population;
         private int foundationYear;
         
+        private bool isDeseralizationProcess;
+        private readonly ApplicationViewModel dataContext;
+        
         public long Id { get; set; }
 
         public string FederationSubject
@@ -66,6 +69,11 @@ namespace CityExplorer
                 OnPropertyChanged(nameof(FoundationYear));
             }
         }
+        
+        public Community(ApplicationViewModel dataContext)
+        {
+            this.dataContext = dataContext;
+        }
 
         public override string ToString()
         {
@@ -87,12 +95,14 @@ namespace CityExplorer
 
         public void Deserialize(List<string> lines)
         {
+            isDeseralizationProcess = true;
             Id = int.Parse(lines[0]);
             FederationSubject = lines[1];
             CommunityType = lines[2];
             Title = lines[3];
             Population = int.Parse(lines[4]);
             FoundationYear = int.Parse(lines[5]);
+            isDeseralizationProcess = false;
         }
 
         public int GetLinesSize()
@@ -106,6 +116,8 @@ namespace CityExplorer
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+            if (!isDeseralizationProcess && dataContext.EditedCommunityCommand.CanExecute(null))
+                dataContext.EditedCommunityCommand.Execute(dataContext.SelectedCommunity);
         }
     }
 }

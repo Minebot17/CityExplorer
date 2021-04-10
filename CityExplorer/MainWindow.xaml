@@ -19,7 +19,7 @@
         </ListView>
         <StackPanel Orientation="Vertical">
             <TextBlock>Субъект федерации</TextBlock>
-            <ComboBox SelectedItem="{Binding SelectedCommunity.FederationSubject}" ItemsSource="{Binding FederationSubjects}" Margin="0 0 0 10" />
+            <ComboBox SelectedItem="{Binding SelectedCommunity.FederationSubject}" ItemsSource="{Binding FederationSubjects}" Margin="0 0 0 10"/>
             
             <TextBlock>Наименование</TextBlock>
             <TextBox Text="{Binding SelectedCommunity.Title}" Margin="0 0 0 10" />
@@ -33,10 +33,9 @@
             <TextBlock>Кол-во жителей</TextBlock>
             <TextBox Text="{Binding SelectedCommunity.Population}" Margin="0 0 0 10" />
             
-            <UniformGrid Rows="1" Columns="3">
-                <Button Content="Добавить" Padding="5 5 5 5" />
-                <Button Content="Сохранить" Padding="5 5 5 5" />
-                <Button Content="Удалить" Padding="5 5 5 5" />
+            <UniformGrid Rows="1" Columns="2">
+                <Button Content="Добавить" Padding="5 5 5 5" Command="{Binding AddCommunityCommand}" />
+                <Button Content="Удалить" Padding="5 5 5 5" Command="{Binding RemoveCommunityCommand}" CommandParameter="{Binding SelectedCommunity.Id}" />
             </UniformGrid>
         </StackPanel>
     </DockPanel>
