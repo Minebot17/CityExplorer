@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,15 +11,18 @@ namespace CityExplorerServer.NetworkSystem
         private const int BUFFER_DATA_COUNT = 10240;
         
         private Stream stream;
+        private StreamString streamString;
         private byte[] buffer = new byte[8];
         private MemoryStream memoryStream;
+        private StreamString memoryStreamString;
         private int dataSize;
 
         public PacketStream(Stream stream)
         {
             this.stream = stream;
             memoryStream = new MemoryStream(new byte[BUFFER_DATA_COUNT]);
-            
+            streamString = new StreamString(stream);
+            memoryStreamString = new StreamString(memoryStream);
         }
 
         public void CollectData(int collectTime)
@@ -40,32 +44,29 @@ namespace CityExplorerServer.NetworkSystem
             stream.Flush();
         }
 
-        public void Write<T>(T value)
-        {
-            if (value is int a)
-                WriteInt(a);
-            else if (value is long b)
-                WriteLong(b);
-            else if (value is string c)
-                WriteString(c);
-        }
-        
-        private void WriteInt(int value)
+        public void Write(int value)
         {
             byte[] buffer = BitConverter.GetBytes(value);
             stream.Write(buffer, 0, 4);
         }
 
-        private void WriteLong(long value)
+        public void Write(long value)
         {
             byte[] buffer = BitConverter.GetBytes(value);
             stream.Write(buffer, 0, 8);
         }
 
-        private void WriteString(string value)
+        public void Write(string value)
         {
             StreamString streamString = new StreamString(stream);
             streamString.WriteString(value);
+        }
+
+        public void Write(List<string> value)
+        {
+            Write(value.Count);
+            foreach (string s in value)
+                Write(s);
         }
 
         public int ReadInt()
@@ -84,9 +85,18 @@ namespace CityExplorerServer.NetworkSystem
         
         public string ReadString()
         {
-            Stream actualStream = DataIsOver() ? stream : memoryStream;
-            StreamString streamString = new StreamString(actualStream);
+            StreamString streamString = DataIsOver() ? this.streamString : memoryStreamString;
             return streamString.ReadString();
+        }
+
+        public List<string> ReadStringList()
+        {
+            int count = ReadInt();
+            List<string> result = new List<string>();
+            for (int i = 0; i < count; i++)
+                result.Add(ReadString());
+
+            return result;
         }
     }
 }

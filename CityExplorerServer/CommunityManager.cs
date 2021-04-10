@@ -16,13 +16,13 @@ namespace CityExplorerServer
             communities = serializer.Load(fabric);
         }
 
-        public long AddNewCommunity()
+        public Community AddNewCommunity()
         {
             lock (communities)
             {
                 Community newCommunity = fabric.Create();
                 communities.Add(newCommunity);
-                return newCommunity.Id;
+                return newCommunity;
             }
         }
 

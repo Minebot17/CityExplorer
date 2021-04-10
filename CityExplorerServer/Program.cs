@@ -5,8 +5,9 @@ using System.IO.Pipes;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using CityExplorerServer.Handlers;
 using CityExplorerServer.NetworkSystem;
-using CityExplorerServer.Operations;
+using CityExplorerServer.Packets;
 
 namespace CityExplorerServer
 {
@@ -22,12 +23,16 @@ namespace CityExplorerServer
         
         private static readonly List<IPacket> packetsToRegister = new List<IPacket>()
         {
-            
+            new AddCommunityPacket(),
+            new RemoveCommunityPacket(),
+            new EditCommunityPacket()
         };
         
         private static readonly List<IPacketHandler> handlersToRegister = new List<IPacketHandler>()
         {
-            
+            new AddCommunityHandler(),
+            new RemoveCommunityHandler(),
+            new EditCommunityHandler()
         };
         
         
