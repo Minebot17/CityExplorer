@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO.Pipes;
 using System.Security.Principal;
 using System.Threading;
+using System.Windows;
 using CityExplorer.Handlers;
 using CityExplorer.Packets;
 using CityExplorerServer;
@@ -76,6 +77,8 @@ namespace CityExplorer
             catch (TimeoutException e)
             {
                 Trace.WriteLine(e.Message);
+                MessageBox.Show("Server not running", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                Application.Current.Shutdown();
             }
             
             clientThread.OnDisconnected();
