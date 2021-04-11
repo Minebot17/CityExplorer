@@ -6,7 +6,7 @@ namespace CityExplorerServer.NetworkSystem
     {
         void SetStream(Stream stream);
         bool HandleStreamWrite(); // if false - disconect
-        bool HandleStreamRead(); // if false - disconect
+        void HandleStreamRead();
         void AddToSendQueue(string packetName, object args);
         
         void OnConnected();

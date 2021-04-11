@@ -54,23 +54,24 @@ namespace CityExplorer
             {
                 pipeClient.Connect(2000);
                 clientThread.OnConnected();
-                //StreamString ss = new StreamString(pipeClient);
+                NetworkManager.SendPacketToServer("getAllDataRequest", null);
 
-                //if (ss.ReadString() == "I am the one true server!")
-                //{
-                    NetworkManager.SendPacketToServer("getAllDataRequest", null);
-
-                    new Thread(() =>
-                    {
-                        while (true)
-                            clientThread.HandleStreamRead();
-                    }).Start();
-                    
+                Thread readThread = new Thread(() =>
+                {
                     while (true)
-                        clientThread.HandleStreamWrite();
-                //}
-                //else
-                //    Trace.WriteLine("Server could not be verified.");
+                        clientThread.HandleStreamRead();
+                });
+                readThread.Start();
+                    
+                while (true)
+                {
+                    bool result = clientThread.HandleStreamWrite();
+                    if (!result)
+                    {
+                        readThread.Abort();
+                        break;
+                    }
+                }
             }
             catch (TimeoutException e)
             {

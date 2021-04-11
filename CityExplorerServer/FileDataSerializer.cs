@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -21,6 +22,7 @@ namespace CityExplorerServer
                 content.AddRange(serializable.Serialize());
             
             File.WriteAllLines(filePath, content, Encoding.UTF8);
+            Console.WriteLine("Saved");
         }
 
         public List<T> Load<T>(ISerializableFabric<T> serializableFabric) where T : IStringSerializable
