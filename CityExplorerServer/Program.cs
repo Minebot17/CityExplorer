@@ -138,7 +138,7 @@ namespace CityExplorerServer
         
         private static void ServerPipeThread(object data)
         {
-            NamedPipeServerStream pipeServer = new NamedPipeServerStream("cityExplorerPipe", PipeDirection.InOut, maxClients);
+            NamedPipeServerStream pipeServer = new NamedPipeServerStream("cityExplorerPipe", PipeDirection.InOut, maxClients, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
             int threadId = Thread.CurrentThread.ManagedThreadId;
             INetworkThread networkThread = (INetworkThread) data;
             networkThread.SetStream(pipeServer);

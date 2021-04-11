@@ -46,8 +46,8 @@ namespace CityExplorer
 
             NamedPipeClientStream pipeClient = 
                 new NamedPipeClientStream(".", "cityExplorerPipe", PipeDirection.InOut, 
-                    PipeOptions.None, TokenImpersonationLevel.Impersonation);
-            
+                    PipeOptions.Asynchronous, TokenImpersonationLevel.Impersonation);
+
             clientThread.SetStream(pipeClient);
 
             try

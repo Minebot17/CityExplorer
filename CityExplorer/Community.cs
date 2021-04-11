@@ -96,7 +96,7 @@ namespace CityExplorer
         public void Deserialize(List<string> lines)
         {
             isDeseralizationProcess = true;
-            Id = int.Parse(lines[0]);
+            Id = long.Parse(lines[0]);
             FederationSubject = lines[1];
             CommunityType = lines[2];
             Title = lines[3];
