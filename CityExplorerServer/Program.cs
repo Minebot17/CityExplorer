@@ -151,11 +151,17 @@ namespace CityExplorerServer
 
                 try
                 {
-                    StreamString ss = new StreamString(pipeServer);
-                    ss.WriteString("I am the one true server!");
+                    //StreamString ss = new StreamString(pipeServer);
+                    //ss.WriteString("I am the one true server!");
 
+                    new Thread(() =>
+                    {
+                        while (true)
+                            networkThread.HandleStreamRead();
+                    }).Start();
+                    
                     while (true)
-                        networkThread.HandleStream();
+                        networkThread.HandleStreamWrite();
                 }
                 catch (IOException e)
                 {

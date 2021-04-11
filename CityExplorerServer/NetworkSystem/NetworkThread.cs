@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Pipes;
 using System.Threading;
 
 namespace CityExplorerServer.NetworkSystem
@@ -23,32 +24,45 @@ namespace CityExplorerServer.NetworkSystem
             packetStream = new PacketStream(stream);
         }
 
-        public bool HandleStream()
+        public bool HandleStreamRead()
         {
-            if (sendQueue.Count == 0)
+            if (!stream.CanRead)
             {
-                Trace.WriteLine("startObserve");
-                bool revievePacket = packetStream.ReadByte(DELAY_PACKET_HANDLE);
-                Trace.WriteLine("endObserve");
-                
-                if (revievePacket)
-                {
-                    Trace.WriteLine("startRecieve");
-                    string packetName = streamString.ReadString();
-                    NetworkManager.RecievePacketFromThread(packetName, packetStream, this);
-                    Trace.WriteLine("endRecieve");
-                }
+                Thread.Sleep(100);
+                return true;
             }
-            else
+            
+            Trace.WriteLine("startObserve");
+            int r = stream.ReadByte();
+            Trace.WriteLine("endObserve");
+                
+            //if (r)
+            //{
+                Trace.WriteLine("startRecieve");
+                string packetName = streamString.ReadString();
+                NetworkManager.RecievePacketFromThread(packetName, packetStream, this);
+                Trace.WriteLine("endRecieve");
+            //}
+            return true;
+        }
+
+        public bool HandleStreamWrite()
+        {
+            if (sendQueue.Count == 0 || !stream.CanWrite)
             {
+                Thread.Sleep(33);
+                return true;
+            }
+            
                 Trace.WriteLine("startSend");
                 try
                 {
-                    stream.Write(new byte[1], 0, 1);
+                    stream.WriteByte(1);
                     (string, object) paketUnit = sendQueue.Dequeue();
                     packetStream.Write(paketUnit.Item1);
                     NetworkManager.SendPacketToOtherSide(paketUnit.Item1, paketUnit.Item2, packetStream);
                     packetStream.Flush();
+                    ((PipeStream)stream).WaitForPipeDrain();
                 }
                 catch (IOException e)
                 {
@@ -58,7 +72,7 @@ namespace CityExplorerServer.NetworkSystem
                 
                 Trace.WriteLine("endSend");
                 Thread.Sleep(DELAY_PACKET_HANDLE);
-            }
+            
             
             return true;
         }
