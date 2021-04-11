@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,7 +18,7 @@ namespace CityExplorerServer.NetworkSystem
         private MemoryStream memoryStream;
         private StreamString memoryStreamString;
         private int dataSize;
-        private CancellationTokenSource tokenSource;
+        private Random rnd;
 
         public PacketStream(Stream stream)
         {
@@ -26,26 +27,65 @@ namespace CityExplorerServer.NetworkSystem
             memoryStream = new MemoryStream(memoryBuffer);
             streamString = new StreamString(stream);
             memoryStreamString = new StreamString(memoryStream);
-            tokenSource = new CancellationTokenSource();
-        }
-
-        public void CollectData(int collectTime)
-        {
-            memoryStream.Seek(0, SeekOrigin.Begin);
-            Task<int> readTask = stream.ReadAsync(memoryBuffer, 0, BUFFER_DATA_COUNT, tokenSource.Token);
-            Thread.Sleep(collectTime);
-            tokenSource.Cancel();
-            Thread.Sleep(collectTime/5);
-            
-            if (readTask.IsCanceled)
-                readTask.Dispose();
-            
-            dataSize = readTask.Result;
+            rnd = new Random();
         }
 
         public bool DataIsOver()
         {
             return memoryStream.Position >= dataSize;
+        }
+
+        public bool ReadByte(int timeout)
+        {
+            /*CancellationTokenSource tokenSource = new CancellationTokenSource();
+            Task<int> readTask = stream.ReadAsync(buffer, 0, 1, tokenSource.Token);
+            Thread.Sleep(timeout);
+
+            if (!readTask.IsCompleted)
+            {
+                tokenSource.Cancel();
+                Thread.Sleep(timeout / 3);
+                readTask.Dispose();
+                return false;
+            }
+
+            if (readTask.Exception != null)
+            {
+                Trace.WriteLine("exception");
+                readTask.Dispose();
+                return false;
+            }
+
+            try
+            {
+                readTask.Dispose();
+                return readTask.Result == 1;
+            }
+            catch (Exception e)
+            {
+                Trace.WriteLine(e);
+                return false;
+            }*/
+
+            /*int result = 0;
+            Thread thread = new Thread(() =>
+            {
+                result = stream.Read(buffer, 0, 1);
+            });
+            thread.Start();
+            Thread.Sleep(timeout);
+
+            bool receive = result == 1;
+            if (!receive)
+                thread.Abort();
+
+            return receive;*/
+            
+            int result = 0;
+            IAsyncResult asyncResult = stream.BeginRead(buffer, 0, 1, ar => { result = 1; }, rnd.Next());
+            Thread.Sleep(timeout);
+            stream.EndRead(asyncResult);
+            return result == 1;
         }
 
         public void Flush()

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
 using System.Runtime.InteropServices;
@@ -154,17 +155,16 @@ namespace CityExplorerServer
                     ss.WriteString("I am the one true server!");
 
                     while (true)
-                    {
                         networkThread.HandleStream();
-                    }
                 }
                 catch (IOException e)
                 {
-                    Console.WriteLine("ERROR: {0}", e.Message);
+                    Trace.WriteLine("ERROR: {0}", e.Message);
                 }
                 
                 pipeServer.Disconnect();
                 networkThread.OnDisconnected();
+                Trace.WriteLine("disconnected");
             }
 
             pipeServer.Close();

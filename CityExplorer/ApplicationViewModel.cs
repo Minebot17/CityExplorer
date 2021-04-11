@@ -5,6 +5,7 @@ using System.IO.Pipes;
 using System.Runtime.CompilerServices;
 using System.Security.Principal;
 using System.Threading;
+using System.Windows.Data;
 using System.Windows.Input;
 using CityExplorer.Annotations;
 using CityExplorerServer;
@@ -16,7 +17,19 @@ namespace CityExplorer
     {
         public ObservableCollection<string> FederationSubjects { get; set; }
         public ObservableCollection<string> CommunityTypes { get; set; }
-        public ObservableCollection<Community> Communities { get; set; }
+
+        private readonly object communitiesLock = new object();
+        private ObservableCollection<Community> communities;
+
+        public ObservableCollection<Community> Communities
+        {
+            get => communities;
+            private set
+            {
+                communities = value;
+                BindingOperations.EnableCollectionSynchronization(communities, communitiesLock);
+            }
+        }
 
         private Community selectedCommunity;
         public Community SelectedCommunity

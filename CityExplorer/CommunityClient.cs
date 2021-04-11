@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO.Pipes;
 using System.Security.Principal;
+using System.Threading;
 using CityExplorer.Handlers;
 using CityExplorer.Packets;
 using CityExplorerServer;
@@ -29,6 +31,7 @@ namespace CityExplorer
         
         public static void Start(object args)
         {
+            Thread.CurrentThread.IsBackground = true;
             ApplicationViewModel viewModel = (ApplicationViewModel) args;
             INetworkThread clientThread = new NetworkThread();
             NetworkManager.InitializeClient(clientThread);
@@ -61,9 +64,12 @@ namespace CityExplorer
                         clientThread.HandleStream();
                 }
                 else
-                    Console.WriteLine("Server could not be verified.");
+                    Trace.WriteLine("Server could not be verified.");
             }
-            catch (TimeoutException e){ Console.WriteLine(e.Message); }
+            catch (TimeoutException e)
+            {
+                Trace.WriteLine(e.Message);
+            }
             
             clientThread.OnDisconnected();
             pipeClient.Close();

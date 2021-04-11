@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 
@@ -7,7 +8,7 @@ namespace CityExplorerServer.NetworkSystem
 {
     public class NetworkThread : INetworkThread
     {
-        private const int DELAY_PACKET_HANDLE = 100;
+        private const int DELAY_PACKET_HANDLE = 50;
         
         private Stream stream;
         private PacketStream packetStream;
@@ -26,18 +27,24 @@ namespace CityExplorerServer.NetworkSystem
         {
             if (sendQueue.Count == 0)
             {
-                packetStream.CollectData(DELAY_PACKET_HANDLE);
-
-                while (!packetStream.DataIsOver())
+                Trace.WriteLine("startObserve");
+                bool revievePacket = packetStream.ReadByte(DELAY_PACKET_HANDLE);
+                Trace.WriteLine("endObserve");
+                
+                if (revievePacket)
                 {
+                    Trace.WriteLine("startRecieve");
                     string packetName = streamString.ReadString();
                     NetworkManager.RecievePacketFromThread(packetName, packetStream, this);
+                    Trace.WriteLine("endRecieve");
                 }
             }
             else
             {
+                Trace.WriteLine("startSend");
                 try
                 {
+                    stream.Write(new byte[1], 0, 1);
                     (string, object) paketUnit = sendQueue.Dequeue();
                     packetStream.Write(paketUnit.Item1);
                     NetworkManager.SendPacketToOtherSide(paketUnit.Item1, paketUnit.Item2, packetStream);
@@ -45,10 +52,11 @@ namespace CityExplorerServer.NetworkSystem
                 }
                 catch (IOException e)
                 {
-                    Console.WriteLine(e);
+                    Trace.WriteLine(e);
                     return false;
                 }
                 
+                Trace.WriteLine("endSend");
                 Thread.Sleep(DELAY_PACKET_HANDLE);
             }
             
