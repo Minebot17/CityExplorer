@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Pipes;
+using System.Linq;
+using System.Net;
+using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
@@ -93,7 +96,18 @@ namespace CityExplorerServer
 
             if (serverType.Equals("socket"))
             {
+                IPAddress localAddr = IPAddress.Parse("127.0.0.1");
+                TcpListener server = new TcpListener(localAddr, int.Parse(ServerConfig["tcpPort"]));
+                server.Start();
+
+                while (true)
+                {
+                    TcpClient client = server.AcceptTcpClient();
+                    INetworkThread firstFree = serverThreads.FirstOrDefault(t => !t.IsConnected());
                 
+                    if (firstFree != null)
+                        new Thread(ServerSocketThread).Start((client.GetStream(), firstFree));
+                }
             }
             else
             {
@@ -134,6 +148,43 @@ namespace CityExplorerServer
             byte[] bytes = new byte[8];
             Random.NextBytes(bytes);
             return BitConverter.ToInt64(bytes, 0);
+        }
+
+        private static void ServerSocketThread(object data)
+        {
+            (NetworkStream, INetworkThread) args = ((NetworkStream, INetworkThread)) data;
+            INetworkThread networkThread = args.Item2;
+            NetworkStream stream = args.Item1;
+            
+            networkThread.SetStream(stream);
+            networkThread.OnConnected();
+            
+            try
+            {
+                Thread readThread = new Thread(() =>
+                {
+                    while (true)
+                        networkThread.HandleStreamRead();
+                });
+                readThread.Start();
+                    
+                while (true)
+                {
+                    bool result = networkThread.HandleStreamWrite();
+                    if (!result)
+                    {
+                        readThread.Abort();
+                        break;
+                    }
+                }
+            }
+            catch (IOException e)
+            {
+                Trace.WriteLine("ERROR: {0}", e.Message);
+            }
+            
+            networkThread.OnDisconnected();
+            stream.Close();
         }
         
         private static void ServerPipeThread(object data)

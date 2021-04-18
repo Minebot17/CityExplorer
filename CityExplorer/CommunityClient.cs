@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO.Pipes;
+using System.Net.Sockets;
 using System.Security.Principal;
 using System.Threading;
 using System.Windows;
@@ -33,7 +34,8 @@ namespace CityExplorer
         public static void Start(object args)
         {
             Thread.CurrentThread.IsBackground = true;
-            ApplicationViewModel viewModel = (ApplicationViewModel) args;
+            (ApplicationViewModel viewModel, int port) data = ((ApplicationViewModel, int)) args;
+            bool isTcp = data.port != 0;
             INetworkThread clientThread = new NetworkThread();
             NetworkManager.InitializeClient(clientThread);
             
@@ -43,17 +45,31 @@ namespace CityExplorer
             foreach (IPacketHandler handler in handlersToRegister)
                 NetworkManager.RegisterHandler(handler);
             
-            NetworkManager.BindArgsToAllRegisteredHandlers(viewModel);
+            NetworkManager.BindArgsToAllRegisteredHandlers(data.viewModel);
 
-            NamedPipeClientStream pipeClient = 
-                new NamedPipeClientStream(".", "cityExplorerPipe", PipeDirection.InOut, 
+            NamedPipeClientStream pipeClient = null;
+            TcpClient tcpClient = null;
+
+            if (isTcp)
+                tcpClient = new TcpClient();
+            else
+                pipeClient = new NamedPipeClientStream(".", "cityExplorerPipe", PipeDirection.InOut, 
                     PipeOptions.Asynchronous, TokenImpersonationLevel.Impersonation);
-
-            clientThread.SetStream(pipeClient);
 
             try
             {
-                pipeClient.Connect(2000);
+                if (isTcp)
+                {
+                    tcpClient.Connect("127.0.0.1", 8888);
+                    clientThread.SetStream(tcpClient.GetStream());
+                }
+                else
+                {
+                    pipeClient.Connect(2000);
+                    clientThread.SetStream(pipeClient);
+                }
+
+
                 clientThread.OnConnected();
                 NetworkManager.SendPacketToServer("getAllDataRequest", null);
 
@@ -63,7 +79,7 @@ namespace CityExplorer
                         clientThread.HandleStreamRead();
                 });
                 readThread.Start();
-                    
+
                 while (true)
                 {
                     bool result = clientThread.HandleStreamWrite();
@@ -78,11 +94,22 @@ namespace CityExplorer
             {
                 Trace.WriteLine(e.Message);
                 MessageBox.Show("Server not running", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                Application.Current.Shutdown();
+                data.viewModel.Communities.Clear();
+                //Application.Current.Shutdown();
+            }
+            catch (SocketException e)
+            {
+                Trace.WriteLine(e.Message);
+                MessageBox.Show("Server not running", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                data.viewModel.Communities.Clear();
             }
             
             clientThread.OnDisconnected();
-            pipeClient.Close();
+            
+            if (isTcp)
+                tcpClient.Close();
+            else
+                pipeClient.Close();
         }
     }
 }

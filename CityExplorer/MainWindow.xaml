@@ -8,6 +8,11 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="295" Width="570" MinHeight="295" MinWidth="570">
     <DockPanel>
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+            <ComboBox Padding="10 5 10 5" SelectedItem="{Binding SelectedConnectionType}" ItemsSource="{Binding ConnectionTypes}" />
+            <TextBlock Padding="10 5 10 5" Visibility="{Binding ShowPort}" Text="Port" />
+            <TextBox Padding="10 5 10 5" Visibility="{Binding ShowPort}" Text="{Binding TcpPort}" />
+        </StackPanel>
         <ListView Width="340" DockPanel.Dock="Left" ItemsSource="{Binding Communities}" SelectedItem="{Binding SelectedCommunity}">
             <ListView.View>
                 <GridView>
