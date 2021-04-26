@@ -66,6 +66,17 @@ namespace CityExplorer
                 ShowPort = value.Equals("TCP") ? Visibility.Visible : Visibility.Hidden;
             }
         }
+        
+        private string tcpIp = "127.0.0.1";
+        public string TcpIp
+        {
+            get => tcpIp;
+            set
+            {
+                tcpIp = value;
+                OnPropertyChanged(nameof(TcpIp));
+            }
+        }
 
         private int tcpPort = 8888;
         public int TcpPort
@@ -120,7 +131,7 @@ namespace CityExplorer
         private void ConnectToServer()
         {
             clientThread = new Thread(CommunityClient.Start);
-            clientThread.Start((this, selectedConnectionType.Equals("Pipe") ? 0 : tcpPort));
+            clientThread.Start((this, selectedConnectionType.Equals("Pipe") ? 0 : tcpPort, tcpIp));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -129,7 +140,7 @@ namespace CityExplorer
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-            if (propertyName.Equals(nameof(TcpPort)) || propertyName.Equals(nameof(SelectedConnectionType)))
+            if (propertyName.Equals(nameof(TcpPort)) || propertyName.Equals(nameof(TcpIp)) || propertyName.Equals(nameof(SelectedConnectionType)))
                 ReconnectCommand.Execute(null);
         }
     }

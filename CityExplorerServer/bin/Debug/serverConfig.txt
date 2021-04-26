@@ -1,0 +1,5 @@
+// socket or pipe
+serverType=socket
+maxClients=8
+saveFileName=serverSave.txt
+tcpPort=8888

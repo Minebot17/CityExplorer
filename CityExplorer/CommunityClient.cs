@@ -34,7 +34,7 @@ namespace CityExplorer
         public static void Start(object args)
         {
             Thread.CurrentThread.IsBackground = true;
-            (ApplicationViewModel viewModel, int port) data = ((ApplicationViewModel, int)) args;
+            (ApplicationViewModel viewModel, int port, string ip) data = ((ApplicationViewModel, int, string)) args;
             bool isTcp = data.port != 0;
             INetworkThread clientThread = new NetworkThread();
             NetworkManager.InitializeClient(clientThread);
@@ -60,7 +60,7 @@ namespace CityExplorer
             {
                 if (isTcp)
                 {
-                    tcpClient.Connect("127.0.0.1", 8888);
+                    tcpClient.Connect(data.ip, data.port);
                     clientThread.SetStream(tcpClient.GetStream());
                 }
                 else

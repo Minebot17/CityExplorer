@@ -10,6 +10,8 @@
     <DockPanel>
         <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
             <ComboBox Padding="10 5 10 5" SelectedItem="{Binding SelectedConnectionType}" ItemsSource="{Binding ConnectionTypes}" />
+            <TextBlock Padding="10 5 10 5" Visibility="{Binding ShowPort}" Text="Ip" />
+            <TextBox Padding="10 5 10 5" Visibility="{Binding ShowPort}" Text="{Binding TcpIp}" />
             <TextBlock Padding="10 5 10 5" Visibility="{Binding ShowPort}" Text="Port" />
             <TextBox Padding="10 5 10 5" Visibility="{Binding ShowPort}" Text="{Binding TcpPort}" />
         </StackPanel>
